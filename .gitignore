@@ -16,3 +16,7 @@
 /tmp/*
 !/log/.keep
 !/tmp/.keep
+
+# Ignore dotenv files:
+*.env
+!*.example.env

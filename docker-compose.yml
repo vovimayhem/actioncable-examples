@@ -1,0 +1,41 @@
+version: "2"
+
+volumes:
+  redis-data:
+    driver: local
+  gems:
+    driver: local
+
+services:
+  keyval:
+    image: redis:3.0
+    command: redis-server --appendonly yes
+    ports:
+      - 6379:6379
+    volumes:
+      - redis-data:/var/lib/redis
+  web: &app
+    image: vovimayhem/ruby:2.2-with-node
+    command: rails server -b 0.0.0.0 -P /tmp/server.pid
+    stdin_open: true
+    tty: true
+    entrypoint: /usr/src/app/development-entrypoint
+    volumes:
+      - .:/usr/src/app
+      - gems:/usr/local/bundle
+    working_dir: /usr/src/app
+    ports:
+      - 3000:3000
+    links:
+      - keyval
+    environment: &app_environment
+      PATH: /usr/src/app/bin:/usr/local/bundle/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      REDIS_URL: redis://keyval:6379
+      RAILS_ENV: development
+    env_file:
+      - development.env
+  websock:
+    <<: *app
+    command: cable
+    ports:
+      - 28080:28080
