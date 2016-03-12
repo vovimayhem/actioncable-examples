@@ -39,6 +39,10 @@ Rails.application.configure do
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 
+  # Configure access to the web console from other development hosts:
+  config.web_console.whitelisted_ips = ENV["WEB_CONSOLE_WHITELISTED_IPS"].split \
+    if ENV.key? "WEB_CONSOLE_WHITELISTED_IPS"
+
   # Set Action Cable server url for consumer connection
   config.action_cable.url = ENV.fetch "APP_CABLE_URL", 'ws://localhost:28080'
   config.action_cable.allowed_request_origins = [
